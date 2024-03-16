@@ -27,7 +27,9 @@ type LoginResponse struct {
 }
 
 type RegisterRequest struct {
-	User UserDTO `json:"user"`
+	User      UserDTO `json:"user"`
+	CaptchaId string  `json:"captcha_id"`
+	Captcha   string  `json:"captcha"`
 }
 
 type RefreshTokenRequest struct {

@@ -45,12 +45,14 @@ func (t *SystemAuthorityController) Login(c *gin.Context) {
 	var l dto.LoginRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
+		return
 	}
 
 	if store.Verify(l.CaptchaId, l.Captcha, true) {
 		r, err := t.userService.Login(c, &l)
 		if err != nil {
 			response.Fail(c, err.Message, map[string]interface{}{})
+			return
 		}
 
 		response.Ok(c, "登录成功", r)
@@ -63,21 +65,28 @@ func (t *SystemAuthorityController) Register(c *gin.Context) {
 	var l dto.RegisterRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
+		return
 	}
 
-	err := t.userService.Register(c, &l)
+	if store.Verify(l.CaptchaId, l.Captcha, true) {
+		err := t.userService.Register(c, &l)
 
-	if err != nil {
-		response.Fail(c, err.Message, map[string]interface{}{})
+		if err != nil {
+			response.Fail(c, err.Message, map[string]interface{}{})
+		} else {
+			response.Ok(c, "注册成功", map[string]interface{}{})
+		}
 	} else {
-		response.Ok(c, "注册成功", map[string]interface{}{})
+		response.Fail(c, "验证码错误", map[string]interface{}{})
 	}
+
 }
 
 func (t *SystemAuthorityController) RefreshToken(c *gin.Context) {
 	var l dto.RefreshTokenRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
+		return
 	}
 
 	r, err := t.userService.RefreshToken(c, &l)
