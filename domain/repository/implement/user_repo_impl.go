@@ -112,7 +112,7 @@ func (r *UserRepositoryImpl) DeleteUserById(ctx context.Context, id string) (boo
 		return false, appErr
 	}
 	user := model.User{}
-	err := db.WithContext(ctx).Delete(&user, id).Error
+	err := db.WithContext(ctx).Where("id = ?", id).Delete(&user).Error
 	if err != nil {
 		return false, core.AsAppError(err)
 	}

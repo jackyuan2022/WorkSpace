@@ -41,6 +41,7 @@ func (rs *CaptchaRedisStore) Get(key string, clear bool) string {
 	val, err := app.AppContext.APP_REDIS.Get(rs.Context, key).Result()
 	if err == redis.Nil {
 		fmt.Println(key, " does not exist")
+		return ""
 	} else if err != nil {
 		fmt.Println(err)
 		return ""

@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	authorizationHeaderKey  = "authorization"
-	authorizationTypeBearer = "bearer"
-	authorizationClaimsKey  = "authorization_claims"
+	authorizationHeaderKey  = "wk-x-authorization"
+	authorizationTypeBearer = "wk-x-bearer"
+	authorizationClaimsKey  = "wk-x-authorization-claims"
 )
 
 func OAuthMiddleware(oauthMaker oauth.OAuthMaker) gin.HandlerFunc {

@@ -75,7 +75,7 @@ func (r *OAuthSessionRepositoryImpl) DeleteById(ctx context.Context, id string) 
 		return false, appErr
 	}
 	data := model.OAuthSession{}
-	err := db.WithContext(ctx).Delete(&data, id).Error
+	err := db.WithContext(ctx).Where("id = ?", id).Delete(&data).Error
 	if err != nil {
 		return false, core.AsAppError(err)
 	}
