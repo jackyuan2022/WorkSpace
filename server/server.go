@@ -24,7 +24,12 @@ func Run() {
 
 	fmt.Println("migrate database start......")
 	router := initializeRouter()
-	router.Run(":8081")
+	// router.Run(":8081")
+	go func() {
+		if err := router.RunTLS(":443", "./certs/loongkirin.chat.crt", "./certs/loongkirin.chat.key"); err != nil {
+			fmt.Println(err)
+		}
+	}()
 }
 
 // 初始化gin总路由
