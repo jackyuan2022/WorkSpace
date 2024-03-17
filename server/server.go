@@ -22,14 +22,15 @@ func Run() {
 	migrator.MigrateDb(app.AppContext.APP_DbContext)
 	fmt.Println("migrate database end......")
 
-	fmt.Println("migrate database start......")
+	fmt.Println("initialization router start......")
 	router := initializeRouter()
 	// router.Run(":8081")
-	go func() {
-		if err := router.RunTLS(":443", "./certs/loongkirin.chat.crt", "./certs/loongkirin.chat.key"); err != nil {
-			fmt.Println(err)
-		}
-	}()
+	// if err := router.RunTLS(":443", "./certs/loongkirin.chat.crt", "./certs/loongkirin.chat.key"); err != nil {
+	// 	fmt.Println(err)
+	// }
+	if err := http.ListenAndServeTLS(":443", "./certs/loongkirin.chat.crt", "./certs/loongkirin.chat.key", router); err != nil {
+		fmt.Println(err)
+	}
 }
 
 // 初始化gin总路由
