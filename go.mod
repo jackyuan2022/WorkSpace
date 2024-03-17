@@ -11,6 +11,7 @@ require (
 	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/viper v1.18.2
+	github.com/unrolled/secure v1.14.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/sync v0.5.0
 	gorm.io/driver/postgres v1.5.7
