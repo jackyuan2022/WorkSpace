@@ -5,11 +5,11 @@ import (
 	controller "github.com/jackyuan2022/workspace/api/controller"
 )
 
-type SystemAuthorityRouter struct{}
+type AuthorityRouter struct{}
 
-func (s *SystemAuthorityRouter) InitSystemAuthorityRouter(router *gin.RouterGroup) (R gin.IRoutes) {
+func (s *AuthorityRouter) InitSystemAuthorityRouter(router *gin.RouterGroup) (R gin.IRoutes) {
 	authRouter := router.Group("auth")
-	authApi := controller.NewSystemAuthorityController()
+	authApi := controller.NewAuthorityController()
 	authRouter.GET("captcha", authApi.Captcha)
 	authRouter.POST("login", authApi.Login)
 	authRouter.POST("register", authApi.Register)

@@ -11,7 +11,7 @@ import (
 
 type SystemDesignerRouter struct{}
 
-func (s *SystemDesignerRouter) InitSystemDesignerRouter(router *gin.RouterGroup) (R gin.IRoutes) {
+func (s *CategoryRouter) InitSystemDesignerRouter(router *gin.RouterGroup) (R gin.IRoutes) {
 	designerRouter := router.Group("notify")
 	oauthMaker, err := oauth.NewPasetoMaker(app.AppContext.APP_CONFIG.OAuthConfig)
 	if err != nil {

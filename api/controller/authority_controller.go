@@ -14,19 +14,19 @@ import (
 
 var store = util.NewDefaultCaptchaRedisStore()
 
-type SystemAuthorityController struct {
+type AuthorityController struct {
 	userService service.UserService
 }
 
-func NewSystemAuthorityController() *SystemAuthorityController {
+func NewAuthorityController() *AuthorityController {
 	userService := serviceImpl.NewUserService()
 
-	return &SystemAuthorityController{
+	return &AuthorityController{
 		userService: userService,
 	}
 }
 
-func (t *SystemAuthorityController) Captcha(c *gin.Context) {
+func (t *AuthorityController) Captcha(c *gin.Context) {
 	driver := base64Captcha.NewDriverDigit(80, 240, 4, 0.7, 80)
 	// cp := base64Captcha.NewCaptcha(driver, store)
 	cp := base64Captcha.NewCaptcha(driver, store.UseWithContext(c))
@@ -41,7 +41,7 @@ func (t *SystemAuthorityController) Captcha(c *gin.Context) {
 	}
 }
 
-func (t *SystemAuthorityController) Login(c *gin.Context) {
+func (t *AuthorityController) Login(c *gin.Context) {
 	var l dto.LoginRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
@@ -61,7 +61,7 @@ func (t *SystemAuthorityController) Login(c *gin.Context) {
 	}
 }
 
-func (t *SystemAuthorityController) Register(c *gin.Context) {
+func (t *AuthorityController) Register(c *gin.Context) {
 	var l dto.RegisterRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
@@ -82,7 +82,7 @@ func (t *SystemAuthorityController) Register(c *gin.Context) {
 
 }
 
-func (t *SystemAuthorityController) RefreshToken(c *gin.Context) {
+func (t *AuthorityController) RefreshToken(c *gin.Context) {
 	var l dto.RefreshTokenRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
