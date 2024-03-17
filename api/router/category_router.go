@@ -19,6 +19,6 @@ func (s *CategoryRouter) InitCategoryRouter(router *gin.RouterGroup) (R gin.IRou
 	categoryRouter.Use(middleware.OAuthMiddleware(oauthMaker))
 	api := controller.NewCategoryController()
 	categoryRouter.POST("category_list", api.GetCategoryList)
-
+	categoryRouter.POST("create_category", api.CreateCategory)
 	return categoryRouter
 }

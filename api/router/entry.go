@@ -8,8 +8,11 @@ type Entry struct {
 }
 
 func (e *Entry) InitAllRouter(router *gin.RouterGroup) {
-	sysAuth := AuthorityRouter{}
-	sysAuth.InitSystemAuthorityRouter(router)
+	authRouter := AuthorityRouter{}
+	authRouter.InitAuthorityRouter(router)
+
+	categoryRouter := CategoryRouter{}
+	categoryRouter.InitCategoryRouter(router)
 
 	sysDesinger := CategoryRouter{}
 	sysDesinger.InitSystemDesignerRouter(router)

@@ -7,7 +7,7 @@ import (
 
 type AuthorityRouter struct{}
 
-func (s *AuthorityRouter) InitSystemAuthorityRouter(router *gin.RouterGroup) (R gin.IRoutes) {
+func (s *AuthorityRouter) InitAuthorityRouter(router *gin.RouterGroup) (R gin.IRoutes) {
 	authRouter := router.Group("auth")
 	authApi := controller.NewAuthorityController()
 	authRouter.GET("captcha", authApi.Captcha)
