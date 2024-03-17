@@ -20,5 +20,7 @@ func (s *CategoryRouter) InitCategoryRouter(router *gin.RouterGroup) (R gin.IRou
 	api := controller.NewCategoryController()
 	categoryRouter.POST("category_list", api.GetCategoryList)
 	categoryRouter.POST("create_category", api.CreateCategory)
+	categoryRouter.POST("update_category", api.UpdateCategory)
+	categoryRouter.POST("delete_category", api.DeleteCategory)
 	return categoryRouter
 }
