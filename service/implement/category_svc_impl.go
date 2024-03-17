@@ -43,7 +43,12 @@ func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCatego
 		return nil, core.NewUnexpectedError("Query Category Data Failure")
 	}
 	var catagoreList []dto.CategoryDTO
-	for _, item := range result {
+	index := len(result)
+	if index > r.PageSize {
+		index = r.PageSize
+	}
+	for i := 0; i < index; i++ {
+		item := result[i]
 		dto := dto.CategoryDTO{
 			Id:           item.DbBaseModel.Id,
 			Icon:         item.Icon,
