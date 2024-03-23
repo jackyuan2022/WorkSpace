@@ -8,6 +8,7 @@ import (
 	model "github.com/jackyuan2022/workspace/domain/model"
 	repo "github.com/jackyuan2022/workspace/domain/repository"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type BookingRepositoryImpl struct {
@@ -44,7 +45,7 @@ func (r *BookingRepositoryImpl) Insert(ctx context.Context, d *model.Booking) (*
 	if appErr != nil {
 		return nil, appErr
 	}
-	err := db.WithContext(ctx).Create(d).Error
+	err := db.WithContext(ctx).Omit(clause.Associations).Create(d).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}
@@ -68,7 +69,7 @@ func (r *BookingRepositoryImpl) Update(ctx context.Context, d *model.Booking) (*
 	data.Status = d.Status
 	data.UserId = d.UserId
 	data.BookingSourceId = d.BookingSourceId
-	err = db.WithContext(ctx).Omit("BookingSource.*", "BookingUser.*").Save(&data).Error
+	err = db.WithContext(ctx).Omit(clause.Associations).Save(&data).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}
@@ -81,7 +82,7 @@ func (r *BookingRepositoryImpl) DeleteById(ctx context.Context, id string) (bool
 		return false, appErr
 	}
 	data := model.Booking{}
-	err := db.WithContext(ctx).Where("id = ?", id).Delete(&data).Error
+	err := db.WithContext(ctx).Omit(clause.Associations).Where("id = ?", id).Delete(&data).Error
 	if err != nil {
 		return false, core.AsAppError(err)
 	}
@@ -96,7 +97,7 @@ func (r *BookingRepositoryImpl) QueryData(ctx context.Context, query *core.DbQue
 	datas := []model.Booking{}
 	whereClaues, values := query.GetWhereClause()
 	offset := (query.PageNumber - 1) * query.PageSize
-	err := db.WithContext(ctx).Where(whereClaues, values).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
+	err := db.WithContext(ctx).Where(whereClaues, values...).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}

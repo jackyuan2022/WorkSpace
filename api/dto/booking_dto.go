@@ -20,6 +20,6 @@ type BookingDTO struct {
 	BookingSourceId  string           `json:"booking_source_id"`
 	BookingSource    BookingSourceDTO `json:"booking_source"`
 	Status           string           `json:"status"`
-	BookingStartTime time.Time        `json:"booking_start_time"`
-	BookingEndTime   *time.Time       `json:"booking_end_time"`
+	BookingStartTime time.Time        `json:"booking_start_time" time_format:"2006-01-02 12:00:00" time_utc:"true"`
+	BookingEndTime   *time.Time       `json:"booking_end_time" time_format:"2006-01-02 12:00:00" time_utc:"true"`
 }

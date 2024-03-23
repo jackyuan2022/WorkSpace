@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	response "github.com/jackyuan2022/workspace/api/core"
 	dto "github.com/jackyuan2022/workspace/api/dto"
@@ -38,6 +40,7 @@ func (t *BookingController) GetBookingList(c *gin.Context) {
 func (t *BookingController) CreateBooking(c *gin.Context) {
 	var r dto.DataRequest[dto.BookingDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
+		fmt.Println(err.Error())
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
 	}

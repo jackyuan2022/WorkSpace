@@ -93,7 +93,7 @@ func (r *BookingSourceRepositoryImpl) QueryData(ctx context.Context, query *core
 	datas := []model.BookingSource{}
 	whereClaues, values := query.GetWhereClause()
 	offset := (query.PageNumber - 1) * query.PageSize
-	err := db.WithContext(ctx).Where(whereClaues, values).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
+	err := db.WithContext(ctx).Where(whereClaues, values...).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}
