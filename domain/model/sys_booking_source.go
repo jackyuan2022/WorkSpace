@@ -6,8 +6,9 @@ import (
 
 type BookingSource struct {
 	core.DbBaseModel
-	Name     string   `json:"name" gorm:"size:100;not null"`
-	Category Category `json:"category" gorm:"foreignKey:category_id;references:id"`
+	Name       string   `json:"name" gorm:"size:100;not null"`
+	CategoryId string   `json:"category_id" gorm:"size:32"`
+	Category   Category `json:"category" gorm:"foreignKey:CategoryId;references:id"`
 }
 
 func (entity *BookingSource) TableName() string {

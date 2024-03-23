@@ -6,7 +6,8 @@ type GetBookingSourceListRequest struct {
 }
 
 type BookingSourceDTO struct {
-	Id       string      `json:"id"`
-	Name     string      `json:"name"`
-	Category CategoryDTO `json:"category"`
+	Id         string      `json:"id"`
+	Name       string      `json:"name"`
+	CategoryId string      `json:"category_id"`
+	Category   CategoryDTO `json:"category"`
 }

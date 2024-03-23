@@ -116,8 +116,9 @@ func (s *BookingSourceServiceImpl) DeleteBookingSource(ctx *gin.Context, r *dto.
 
 func (s *BookingSourceServiceImpl) convertModel2Dto(m model.BookingSource) (d dto.BookingSourceDTO) {
 	d = dto.BookingSourceDTO{
-		Id:   m.DbBaseModel.Id,
-		Name: m.Name,
+		Id:         m.DbBaseModel.Id,
+		Name:       m.Name,
+		CategoryId: m.CategoryId,
 		Category: dto.CategoryDTO{
 			Id:           m.Category.Id,
 			Name:         m.Category.Name,
@@ -134,7 +135,8 @@ func (s *BookingSourceServiceImpl) convertDto2Model(d dto.BookingSourceDTO) (m m
 		id = util.GenerateId()
 	}
 	m = model.BookingSource{
-		Name: d.Name,
+		Name:       d.Name,
+		CategoryId: d.CategoryId,
 		Category: model.Category{
 			Name:         d.Category.Name,
 			CategoryType: d.Category.CategoryType,
