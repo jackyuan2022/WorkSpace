@@ -66,7 +66,9 @@ func (r *BookingRepositoryImpl) Update(ctx context.Context, d *model.Booking) (*
 	data.BookingStartTime = d.BookingStartTime
 	data.BookingEndTime = d.BookingEndTime
 	data.Status = d.Status
-	err = db.WithContext(ctx).Omit("Category.*", "BookingUser.*").Save(&data).Error
+	data.UserId = d.UserId
+	data.BookingSourceId = d.BookingSourceId
+	err = db.WithContext(ctx).Omit("BookingSource.*", "BookingUser.*").Save(&data).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}

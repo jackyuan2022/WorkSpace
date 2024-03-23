@@ -63,6 +63,7 @@ func (r *BookingSourceRepositoryImpl) Update(ctx context.Context, d *model.Booki
 		return nil, core.AsAppError(err)
 	}
 	data.Name = d.Name
+	data.CategoryId = d.CategoryId
 	data.Category = d.Category
 	err = db.WithContext(ctx).Omit(clause.Associations).Save(&data).Error
 	if err != nil {

@@ -17,6 +17,6 @@ func MigrateDb(dbContext core.DbContext) {
 	db.AutoMigrate(&model.OAuthSession{})
 	db.AutoMigrate(&model.Category{})
 	db.AutoMigrate(&model.BookingSource{})
-	// db.AutoMigrate(&model.Booking{})
+	db.AutoMigrate(&model.Booking{})
 	fmt.Println("migrate db end.....")
 }

@@ -31,8 +31,11 @@ func NewBookingService() svc.BookingService {
 }
 
 func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingListRequest) (res *dto.DataListResponse[dto.BookingDTO], err *core.AppError) {
-	values := []interface{}{r.CategoryId}
-	filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_id", values, "EQ", "string")}
+	values := []interface{}{r.BookingSourceId}
+	filters := []core.DbQueryFilter{core.NewDbQueryFilter("booking_source_id", values, "EQ", "string")}
+	if len(r.UserId) > 0 {
+		filters = append(filters, core.NewDbQueryFilter("user_id", []interface{}{r.UserId}, "EQ", "string"))
+	}
 	wheres := []core.DbQueryWhere{core.NewDbQueryWhere(filters, "AND")}
 	query := &core.DbQuery{
 		QueryWheres: wheres,
@@ -121,12 +124,11 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 		Content:          m.Content.String,
 		BookingStartTime: m.BookingStartTime,
 		BookingEndTime:   nil,
-		CategoryId:       m.CategoryId,
+		BookingSourceId:  m.BookingSourceId,
 		UserId:           m.UserId,
-		Category: dto.CategoryDTO{
-			Id:           m.Category.Id,
-			Name:         m.Category.Name,
-			CategoryType: m.Category.CategoryType,
+		BookingSource: dto.BookingSourceDTO{
+			Id:   m.BookingSource.Id,
+			Name: m.BookingSource.Name,
 		},
 		BookingUser: dto.UserDTO{
 			UserId:   m.BookingUser.Id,
@@ -151,11 +153,11 @@ func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking
 		Content:          sql.NullString{String: d.Content},
 		BookingStartTime: d.BookingStartTime,
 		BookingEndTime:   sql.NullTime{},
-		CategoryId:       d.CategoryId,
+		BookingSourceId:  d.BookingSourceId,
 		UserId:           d.UserId,
-		Category: model.Category{
-			Name:        d.Category.Name,
-			DbBaseModel: core.NewDbBaseModel(d.Category.Id),
+		BookingSource: model.BookingSource{
+			Name:        d.BookingSource.Name,
+			DbBaseModel: core.NewDbBaseModel(d.BookingSource.Id),
 		},
 		BookingUser: model.User{
 			Name:        d.BookingUser.UserName,
