@@ -94,7 +94,7 @@ func (s *BookingServiceImpl) CreateBooking(ctx *gin.Context, r *dto.BookingReque
 		return nil, core.NewUnexpectedError("Insert Category Data Failure")
 	}
 	res = &dto.BookingResponse{
-		Booking: convertModel2Dto(*result),
+		Booking: s.convertModel2Dto(*result),
 	}
 	return res, nil
 }
@@ -107,13 +107,13 @@ func (s *BookingServiceImpl) UpdateBooking(ctx *gin.Context, r *dto.BookingReque
 	if strings.Trim(r.Booking.Title, " ") == "" {
 		return nil, core.NewValidationError("预约名称不能为空")
 	}
-	booking := convertDto2Model(r.Booking)
+	booking := s.convertDto2Model(r.Booking)
 	result, err := s.dataRepo.Update(ctx, &booking)
 	if err != nil {
 		return nil, core.NewUnexpectedError("Update Booking Data Failure")
 	}
 	res = &dto.BookingResponse{
-		Booking: convertModel2Dto(*result),
+		Booking: s.convertModel2Dto(*result),
 	}
 	return res, nil
 }
@@ -129,7 +129,7 @@ func (s *BookingServiceImpl) DeleteBooking(ctx *gin.Context, r *dto.BookingReque
 	return res, nil
 }
 
-func convertModel2Dto(m model.Booking) (d dto.BookingDTO) {
+func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO) {
 	d = dto.BookingDTO{
 		Id:               m.DbBaseModel.Id,
 		Title:            m.Title,
@@ -154,7 +154,7 @@ func convertModel2Dto(m model.Booking) (d dto.BookingDTO) {
 	return d
 }
 
-func convertDto2Model(d dto.BookingDTO) (m model.Booking) {
+func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking) {
 	m = model.Booking{
 		Title:            d.Title,
 		Content:          sql.NullString{String: d.Content},
