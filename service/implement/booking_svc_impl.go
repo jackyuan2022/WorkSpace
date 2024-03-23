@@ -13,7 +13,7 @@ import (
 	repo "github.com/jackyuan2022/workspace/domain/repository"
 	repoImpl "github.com/jackyuan2022/workspace/domain/repository/implement"
 	svc "github.com/jackyuan2022/workspace/service"
-	util "github.com/jackyuan2022/workspace/util"
+	"github.com/jackyuan2022/workspace/util"
 )
 
 type BookingServiceImpl struct {
@@ -30,7 +30,7 @@ func NewBookingService() svc.BookingService {
 	return bookingySvc
 }
 
-func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingListRequest) (res *dto.GetBookingListResponse, err *core.AppError) {
+func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingListRequest) (res *dto.DataListResponse[dto.BookingDTO], err *core.AppError) {
 	values := []interface{}{r.CategoryId}
 	filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_id", values, "EQ", "string")}
 	wheres := []core.DbQueryWhere{core.NewDbQueryWhere(filters, "AND")}
@@ -50,81 +50,66 @@ func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingL
 	}
 	for i := 0; i < index; i++ {
 		item := result[i]
-		dto := dto.BookingDTO{
-			Id:               item.DbBaseModel.Id,
-			Title:            item.Title,
-			Content:          item.Content.String,
-			BookingStartTime: item.BookingStartTime,
-			BookingEndTime:   &item.BookingEndTime.Time,
-			Category: dto.CategoryDTO{
-				Id:           item.Category.Id,
-				Name:         item.Category.Name,
-				CategoryType: item.Category.CategoryType,
-			},
-			BookingUser: dto.UserDTO{
-				UserId:   item.BookingUser.Id,
-				UserName: item.BookingUser.Name,
-				Mobile:   item.BookingUser.Mobile,
-			},
-		}
+		dto := s.convertModel2Dto(item)
 		bookingList = append(bookingList, dto)
 	}
-	res = &dto.GetBookingListResponse{
-		BookingList: bookingList,
-		HasNextPage: len(result) >= r.PageSize+1,
+	res = &dto.DataListResponse[dto.BookingDTO]{
+		DataList: bookingList,
+		Pagination: dto.PageDTO{
+			PageSize:    r.PageSize,
+			PageNumber:  r.PageNumber,
+			HasNextPage: len(result) > r.PageSize,
+		},
 	}
 	return res, nil
 }
 
-func (s *BookingServiceImpl) CreateBooking(ctx *gin.Context, r *dto.BookingRequest) (res *dto.BookingResponse, err *core.AppError) {
+func (s *BookingServiceImpl) CreateBooking(ctx *gin.Context, r *dto.DataRequest[dto.BookingDTO]) (res *dto.DataResponse[dto.BookingDTO], err *core.AppError) {
 	if r == nil {
 		return nil, core.NewValidationError("参数错误")
 	}
 
-	if strings.Trim(r.Booking.Title, " ") == "" {
+	if strings.Trim(r.Data.Title, " ") == "" {
 		return nil, core.NewValidationError("名称不能为空")
 	}
-	booking := model.Booking{
-		Title:       r.Booking.Title,
-		DbBaseModel: core.NewDbBaseModel(util.GenerateId()),
-	}
+	booking := s.convertDto2Model(r.Data)
 
 	result, err := s.dataRepo.Insert(ctx, &booking)
 	if err != nil {
 		return nil, core.NewUnexpectedError("Insert Category Data Failure")
 	}
-	res = &dto.BookingResponse{
-		Booking: s.convertModel2Dto(*result),
+	res = &dto.DataResponse[dto.BookingDTO]{
+		Data: s.convertModel2Dto(*result),
 	}
 	return res, nil
 }
 
-func (s *BookingServiceImpl) UpdateBooking(ctx *gin.Context, r *dto.BookingRequest) (res *dto.BookingResponse, err *core.AppError) {
+func (s *BookingServiceImpl) UpdateBooking(ctx *gin.Context, r *dto.DataRequest[dto.BookingDTO]) (res *dto.DataResponse[dto.BookingDTO], err *core.AppError) {
 	if r == nil {
 		return nil, core.NewValidationError("参数错误")
 	}
 
-	if strings.Trim(r.Booking.Title, " ") == "" {
+	if strings.Trim(r.Data.Title, " ") == "" {
 		return nil, core.NewValidationError("预约名称不能为空")
 	}
-	booking := s.convertDto2Model(r.Booking)
+	booking := s.convertDto2Model(r.Data)
 	result, err := s.dataRepo.Update(ctx, &booking)
 	if err != nil {
 		return nil, core.NewUnexpectedError("Update Booking Data Failure")
 	}
-	res = &dto.BookingResponse{
-		Booking: s.convertModel2Dto(*result),
+	res = &dto.DataResponse[dto.BookingDTO]{
+		Data: s.convertModel2Dto(*result),
 	}
 	return res, nil
 }
 
-func (s *BookingServiceImpl) DeleteBooking(ctx *gin.Context, r *dto.BookingRequest) (res *dto.BookingResponse, err *core.AppError) {
-	_, err = s.dataRepo.DeleteById(ctx, r.Booking.Id)
+func (s *BookingServiceImpl) DeleteBooking(ctx *gin.Context, r *dto.DataRequest[dto.BookingDTO]) (res *dto.DataResponse[dto.BookingDTO], err *core.AppError) {
+	_, err = s.dataRepo.DeleteById(ctx, r.Data.Id)
 	if err != nil {
 		return nil, core.NewUnexpectedError("Delete Booking Data Failure")
 	}
-	res = &dto.BookingResponse{
-		Booking: r.Booking,
+	res = &dto.DataResponse[dto.BookingDTO]{
+		Data: r.Data,
 	}
 	return res, nil
 }
@@ -136,6 +121,8 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 		Content:          m.Content.String,
 		BookingStartTime: m.BookingStartTime,
 		BookingEndTime:   nil,
+		CategoryId:       m.CategoryId,
+		UserId:           m.UserId,
 		Category: dto.CategoryDTO{
 			Id:           m.Category.Id,
 			Name:         m.Category.Name,
@@ -155,11 +142,17 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 }
 
 func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking) {
+	id := d.Id
+	if len(id) < 1 {
+		id = util.GenerateId()
+	}
 	m = model.Booking{
 		Title:            d.Title,
 		Content:          sql.NullString{String: d.Content},
 		BookingStartTime: d.BookingStartTime,
 		BookingEndTime:   sql.NullTime{},
+		CategoryId:       d.CategoryId,
+		UserId:           d.UserId,
 		Category: model.Category{
 			Name:        d.Category.Name,
 			DbBaseModel: core.NewDbBaseModel(d.Category.Id),
@@ -170,7 +163,7 @@ func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking
 			DbBaseModel: core.NewDbBaseModel(d.BookingUser.UserId),
 		},
 		Status:      d.Status,
-		DbBaseModel: core.NewDbBaseModel(d.Id),
+		DbBaseModel: core.NewDbBaseModel(id),
 	}
 	if d.BookingEndTime != nil {
 		m.BookingEndTime.Time = *d.BookingEndTime

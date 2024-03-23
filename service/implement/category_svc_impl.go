@@ -29,7 +29,7 @@ func NewCategoryService() svc.CategoryService {
 	return categorySvc
 }
 
-func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCategoryListRequest) (res *dto.GetCategoryListResponse, err *core.AppError) {
+func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCategoryListRequest) (res *dto.DataListResponse[dto.CategoryDTO], err *core.AppError) {
 	values := []interface{}{r.CategoryType}
 	filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_type", values, "EQ", "string")}
 	wheres := []core.DbQueryWhere{core.NewDbQueryWhere(filters, "AND")}
@@ -58,26 +58,30 @@ func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCatego
 		}
 		catagoreList = append(catagoreList, dto)
 	}
-	res = &dto.GetCategoryListResponse{
-		CategoryList: catagoreList,
-		HasNextPage:  len(result) >= r.PageSize+1,
+	res = &dto.DataListResponse[dto.CategoryDTO]{
+		DataList: catagoreList,
+		Pagination: dto.PageDTO{
+			PageSize:    r.PageSize,
+			PageNumber:  r.PageNumber,
+			HasNextPage: len(result) > r.PageSize,
+		},
 	}
 	return res, nil
 }
 
-func (s *CategoryServiceImpl) CreateCategory(ctx *gin.Context, r *dto.CategoryRequest) (res *dto.CategoryResponse, err *core.AppError) {
+func (s *CategoryServiceImpl) CreateCategory(ctx *gin.Context, r *dto.DataRequest[dto.CategoryDTO]) (res *dto.DataResponse[dto.CategoryDTO], err *core.AppError) {
 	if r == nil {
 		return nil, core.NewValidationError("参数错误")
 	}
 
-	if strings.Trim(r.Category.Name, " ") == "" {
+	if strings.Trim(r.Data.Name, " ") == "" {
 		return nil, core.NewValidationError("名称不能为空")
 	}
 	category := model.Category{
-		Name:         r.Category.Name,
-		Icon:         r.Category.Icon,
-		Order:        r.Category.Order,
-		CategoryType: r.Category.CategoryType,
+		Name:         r.Data.Name,
+		Icon:         r.Data.Icon,
+		Order:        r.Data.Order,
+		CategoryType: r.Data.CategoryType,
 		DbBaseModel:  core.NewDbBaseModel(util.GenerateId()),
 	}
 
@@ -85,8 +89,8 @@ func (s *CategoryServiceImpl) CreateCategory(ctx *gin.Context, r *dto.CategoryRe
 	if err != nil {
 		return nil, core.NewUnexpectedError("Insert Category Data Failure")
 	}
-	res = &dto.CategoryResponse{
-		Category: dto.CategoryDTO{
+	res = &dto.DataResponse[dto.CategoryDTO]{
+		Data: dto.CategoryDTO{
 			Id:           result.Id,
 			Name:         result.Name,
 			Icon:         result.Icon,
@@ -97,28 +101,28 @@ func (s *CategoryServiceImpl) CreateCategory(ctx *gin.Context, r *dto.CategoryRe
 	return res, nil
 }
 
-func (s *CategoryServiceImpl) UpdateCategory(ctx *gin.Context, r *dto.CategoryRequest) (res *dto.CategoryResponse, err *core.AppError) {
+func (s *CategoryServiceImpl) UpdateCategory(ctx *gin.Context, r *dto.DataRequest[dto.CategoryDTO]) (res *dto.DataResponse[dto.CategoryDTO], err *core.AppError) {
 	if r == nil {
 		return nil, core.NewValidationError("参数错误")
 	}
 
-	if strings.Trim(r.Category.Name, " ") == "" {
+	if strings.Trim(r.Data.Name, " ") == "" {
 		return nil, core.NewValidationError("名称不能为空")
 	}
 	category := model.Category{
-		Name:         r.Category.Name,
-		Icon:         r.Category.Icon,
-		Order:        r.Category.Order,
-		CategoryType: r.Category.CategoryType,
-		DbBaseModel:  core.NewDbBaseModel(r.Category.Id),
+		Name:         r.Data.Name,
+		Icon:         r.Data.Icon,
+		Order:        r.Data.Order,
+		CategoryType: r.Data.CategoryType,
+		DbBaseModel:  core.NewDbBaseModel(r.Data.Id),
 	}
 
 	result, err := s.dataRepo.Update(ctx, &category)
 	if err != nil {
 		return nil, core.NewUnexpectedError("Update Category Data Failure")
 	}
-	res = &dto.CategoryResponse{
-		Category: dto.CategoryDTO{
+	res = &dto.DataResponse[dto.CategoryDTO]{
+		Data: dto.CategoryDTO{
 			Id:    result.Id,
 			Name:  result.Name,
 			Icon:  result.Icon,
@@ -128,13 +132,13 @@ func (s *CategoryServiceImpl) UpdateCategory(ctx *gin.Context, r *dto.CategoryRe
 	return res, nil
 }
 
-func (s *CategoryServiceImpl) DeleteCategory(ctx *gin.Context, r *dto.CategoryRequest) (res *dto.CategoryResponse, err *core.AppError) {
-	_, err = s.dataRepo.DeleteById(ctx, r.Category.Id)
+func (s *CategoryServiceImpl) DeleteCategory(ctx *gin.Context, r *dto.DataRequest[dto.CategoryDTO]) (res *dto.DataResponse[dto.CategoryDTO], err *core.AppError) {
+	_, err = s.dataRepo.DeleteById(ctx, r.Data.Id)
 	if err != nil {
 		return nil, core.NewUnexpectedError("Delete Category Data Failure")
 	}
-	res = &dto.CategoryResponse{
-		Category: r.Category,
+	res = &dto.DataResponse[dto.CategoryDTO]{
+		Data: r.Data,
 	}
 	return res, nil
 }

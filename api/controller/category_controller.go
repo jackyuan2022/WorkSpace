@@ -36,7 +36,7 @@ func (t *CategoryController) GetCategoryList(c *gin.Context) {
 }
 
 func (t *CategoryController) CreateCategory(c *gin.Context) {
-	var r dto.CategoryRequest
+	var r dto.DataRequest[dto.CategoryDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
@@ -51,7 +51,7 @@ func (t *CategoryController) CreateCategory(c *gin.Context) {
 }
 
 func (t *CategoryController) UpdateCategory(c *gin.Context) {
-	var r dto.CategoryRequest
+	var r dto.DataRequest[dto.CategoryDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
@@ -66,7 +66,7 @@ func (t *CategoryController) UpdateCategory(c *gin.Context) {
 }
 
 func (t *CategoryController) DeleteCategory(c *gin.Context) {
-	var r dto.CategoryRequest
+	var r dto.DataRequest[dto.CategoryDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return

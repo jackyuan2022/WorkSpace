@@ -17,6 +17,9 @@ func (e *Entry) InitAllRouter(router *gin.RouterGroup) {
 	bookingSourceRouter := BookingSourceRouter{}
 	bookingSourceRouter.InitBookingSourceRouter(router)
 
+	bookingRouter := BookingRouter{}
+	bookingRouter.InitBookingRouter(router)
+
 	sysDesinger := CategoryRouter{}
 	sysDesinger.InitSystemDesignerRouter(router)
 

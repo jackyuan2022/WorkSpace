@@ -8,74 +8,74 @@ import (
 	serviceImpl "github.com/jackyuan2022/workspace/service/implement"
 )
 
-type BookingSourceController struct {
-	dataService service.BookingSourceService
+type BookingController struct {
+	dataService service.BookingService
 }
 
-func NewBookingSourceController() *BookingSourceController {
-	svc := serviceImpl.NewBookingSourceService()
+func NewBookingController() *BookingController {
+	svc := serviceImpl.NewBookingService()
 
-	return &BookingSourceController{
+	return &BookingController{
 		dataService: svc,
 	}
 }
 
-func (t *BookingSourceController) GetBookingSourceList(c *gin.Context) {
-	var r dto.GetBookingSourceListRequest
+func (t *BookingController) GetBookingList(c *gin.Context) {
+	var r dto.GetBookingListRequest
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
 	}
-	res, err := t.dataService.GetBookingSourceList(c, &r)
+	res, err := t.dataService.GetBookingList(c, &r)
 
 	if err != nil {
 		response.Fail(c, err.Message, map[string]interface{}{})
 	} else {
-		response.Ok(c, "获取预约资源成功", res)
+		response.Ok(c, "获取预约成功", res)
 	}
 }
 
-func (t *BookingSourceController) CreateBookingSource(c *gin.Context) {
-	var r dto.DataRequest[dto.BookingSourceDTO]
+func (t *BookingController) CreateBooking(c *gin.Context) {
+	var r dto.DataRequest[dto.BookingDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
 	}
-	res, err := t.dataService.CreateBookingSource(c, &r)
+	res, err := t.dataService.CreateBooking(c, &r)
 
 	if err != nil {
 		response.Fail(c, err.Message, map[string]interface{}{})
 	} else {
-		response.Ok(c, "创建预约资源成功", res)
+		response.Ok(c, "创建预约成功", res)
 	}
 }
 
-func (t *BookingSourceController) UpdateBookingSource(c *gin.Context) {
-	var r dto.DataRequest[dto.BookingSourceDTO]
+func (t *BookingController) UpdateBooking(c *gin.Context) {
+	var r dto.DataRequest[dto.BookingDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
 	}
-	res, err := t.dataService.UpdateBookingSource(c, &r)
+	res, err := t.dataService.UpdateBooking(c, &r)
 
 	if err != nil {
 		response.Fail(c, err.Message, map[string]interface{}{})
 	} else {
-		response.Ok(c, "更新预约资源成功", res)
+		response.Ok(c, "更新预约成功", res)
 	}
 }
 
-func (t *BookingSourceController) DeleteBookingSource(c *gin.Context) {
-	var r dto.DataRequest[dto.BookingSourceDTO]
+func (t *BookingController) DeleteBooking(c *gin.Context) {
+	var r dto.DataRequest[dto.BookingDTO]
 	if err := c.ShouldBindJSON(&r); err != nil {
 		response.BadRequest(c, "Bad Request:Invalid Parameters", map[string]interface{}{})
 		return
 	}
-	res, err := t.dataService.DeleteBookingSource(c, &r)
+	res, err := t.dataService.DeleteBooking(c, &r)
 
 	if err != nil {
 		response.Fail(c, err.Message, map[string]interface{}{})
 	} else {
-		response.Ok(c, "删除预约资源成功", res)
+		response.Ok(c, "删除预约成功", res)
 	}
 }

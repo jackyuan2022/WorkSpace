@@ -8,8 +8,8 @@ import (
 )
 
 type CategoryService interface {
-	GetCategoryList(ctx *gin.Context, r *dto.GetCategoryListRequest) (res *dto.GetCategoryListResponse, err *core.AppError)
-	CreateCategory(ctx *gin.Context, r *dto.CategoryRequest) (res *dto.CategoryResponse, err *core.AppError)
-	UpdateCategory(ctx *gin.Context, r *dto.CategoryRequest) (res *dto.CategoryResponse, err *core.AppError)
-	DeleteCategory(ctx *gin.Context, r *dto.CategoryRequest) (res *dto.CategoryResponse, err *core.AppError)
+	GetCategoryList(ctx *gin.Context, r *dto.GetCategoryListRequest) (res *dto.DataListResponse[dto.CategoryDTO], err *core.AppError)
+	CreateCategory(ctx *gin.Context, r *dto.DataRequest[dto.CategoryDTO]) (res *dto.DataResponse[dto.CategoryDTO], err *core.AppError)
+	UpdateCategory(ctx *gin.Context, r *dto.DataRequest[dto.CategoryDTO]) (res *dto.DataResponse[dto.CategoryDTO], err *core.AppError)
+	DeleteCategory(ctx *gin.Context, r *dto.DataRequest[dto.CategoryDTO]) (res *dto.DataResponse[dto.CategoryDTO], err *core.AppError)
 }
