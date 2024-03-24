@@ -31,16 +31,19 @@ func NewBookingService() svc.BookingService {
 }
 
 func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingListRequest) (res *dto.DataListResponse[dto.BookingDTO], err *core.AppError) {
-	values := []interface{}{r.BookingSourceId}
-	filters := []core.DbQueryFilter{core.NewDbQueryFilter("booking_source_id", values, "EQ", "string")}
+	wheres := []core.DbQueryWhere{}
+	filters := []core.DbQueryFilter{}
+	if len(r.BookingSourceId) > 0 {
+		filters = append(filters, core.NewDbQueryFilter("booking_source_id", []interface{}{r.BookingSourceId}, "EQ", "string"))
+	}
 	if len(r.UserId) > 0 {
 		filters = append(filters, core.NewDbQueryFilter("user_id", []interface{}{r.UserId}, "EQ", "string"))
 	}
-	wheres := []core.DbQueryWhere{core.NewDbQueryWhere(filters, "AND")}
+	wheres = append(wheres, core.NewDbQueryWhere(filters, "AND"))
 	query := &core.DbQuery{
 		QueryWheres: wheres,
-		PageSize:    r.PageSize,
-		PageNumber:  r.PageNumber,
+		PageSize:    r.Pagination.PageSize,
+		PageNumber:  r.Pagination.PageNumber,
 	}
 	result, err := s.dataRepo.QueryData(ctx, query)
 	if err != nil {
@@ -48,8 +51,8 @@ func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingL
 	}
 	var bookingList []dto.BookingDTO
 	index := len(result)
-	if index > r.PageSize {
-		index = r.PageSize
+	if index > r.Pagination.PageSize {
+		index = r.Pagination.PageSize
 	}
 	for i := 0; i < index; i++ {
 		item := result[i]
@@ -59,9 +62,9 @@ func (s *BookingServiceImpl) GetBookingList(ctx *gin.Context, r *dto.GetBookingL
 	res = &dto.DataListResponse[dto.BookingDTO]{
 		DataList: bookingList,
 		Pagination: dto.PageDTO{
-			PageSize:    r.PageSize,
-			PageNumber:  r.PageNumber,
-			HasNextPage: len(result) > r.PageSize,
+			PageSize:    r.Pagination.PageSize,
+			PageNumber:  r.Pagination.PageNumber,
+			HasNextPage: len(result) > r.Pagination.PageSize,
 		},
 	}
 	return res, nil

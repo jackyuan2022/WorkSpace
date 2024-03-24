@@ -30,9 +30,11 @@ func NewBookingSourceService() svc.BookingSourceService {
 }
 
 func (s *BookingSourceServiceImpl) GetBookingSourceList(ctx *gin.Context, r *dto.GetBookingSourceListRequest) (res *dto.DataListResponse[dto.BookingSourceDTO], err *core.AppError) {
-	values := []interface{}{r.CategoryId}
-	filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_id", values, "EQ", "string")}
-	wheres := []core.DbQueryWhere{core.NewDbQueryWhere(filters, "AND")}
+	wheres := []core.DbQueryWhere{}
+	if len(r.CategoryId) > 0 {
+		filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_id", []interface{}{r.CategoryId}, "EQ", "string")}
+		wheres = append(wheres, core.NewDbQueryWhere(filters, "AND"))
+	}
 	query := &core.DbQuery{
 		QueryWheres: wheres,
 		PageSize:    r.Pagination.PageSize,

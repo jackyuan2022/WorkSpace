@@ -91,9 +91,9 @@ func (r *CategoryRepositoryImpl) QueryData(ctx context.Context, query *core.DbQu
 		return nil, appErr
 	}
 	datas := []model.Category{}
-	whereClaues, values := query.GetWhereClause()
+	whereClaues, values, order := query.GetWhereClause()
 	offset := (query.PageNumber - 1) * query.PageSize
-	err := db.WithContext(ctx).Where(whereClaues, values).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
+	err := db.WithContext(ctx).Where(whereClaues, values...).Order(order).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}

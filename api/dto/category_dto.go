@@ -1,9 +1,8 @@
 package dto
 
 type GetCategoryListRequest struct {
-	CategoryType string `json:"category_type"`
-	PageSize     int    `json:"page_size"`
-	PageNumber   int    `json:"page_number"`
+	CategoryType string  `json:"category_type"`
+	Pagination   PageDTO `json:"page_info"`
 }
 
 type CategoryDTO struct {

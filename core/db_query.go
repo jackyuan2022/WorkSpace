@@ -6,24 +6,28 @@ import (
 )
 
 type DbQuery struct {
-	QueryWheres []DbQueryWhere `json:"query_wheres"`
-	PageSize    int            `json:"page_size"`
-	PageNumber  int            `json:"page_number"`
+	QueryWheres []DbQueryWhere   `json:"query_wheres"`
+	OrderBy     []DbQueryOrderBy `json:"order_by"`
+	PageSize    int              `json:"page_size"`
+	PageNumber  int              `json:"page_number"`
 }
 
-func NewDbQuery(wheres []DbQueryWhere, ps int, pn int) *DbQuery {
+func NewDbQuery(wheres []DbQueryWhere, ps int, pn int, order []DbQueryOrderBy) *DbQuery {
 	return &DbQuery{
 		QueryWheres: wheres,
 		PageSize:    ps,
 		PageNumber:  pn,
+		OrderBy:     order,
 	}
 }
 
-func (q *DbQuery) GetWhereClause() (whereClause string, values []interface{}) {
-	whereClause = " 1=1 AND "
+func (q *DbQuery) GetWhereClause() (whereClause string, values []interface{}, order string) {
+	whereClause = " 1=1 "
+	order = "id"
 	if len(q.QueryWheres) < 1 {
-		return whereClause, values
+		return whereClause, values, order
 	}
+	whereClause += "AND "
 	var sb strings.Builder
 
 	for _, where := range q.QueryWheres {
@@ -70,5 +74,19 @@ func (q *DbQuery) GetWhereClause() (whereClause string, values []interface{}) {
 	whereClause = whereClause + sb.String()
 	whereClause = strings.Trim(whereClause, "AND ")
 	whereClause = strings.Trim(whereClause, "OR ")
-	return whereClause, values
+
+	var sbOrder strings.Builder
+	for _, order := range q.OrderBy {
+		if order.IsAsc {
+			sbOrder.WriteString(fmt.Sprintf("%s,", order.FieldName))
+		} else {
+			sbOrder.WriteString(fmt.Sprintf("%s desc,", order.FieldName))
+		}
+	}
+	order = sbOrder.String()
+	order = strings.Trim(order, ",")
+	if len(order) < 1 {
+		order = "id"
+	}
+	return whereClause, values, order
 }

@@ -5,10 +5,9 @@ import (
 )
 
 type GetBookingListRequest struct {
-	BookingSourceId string `json:"booking_source_id"`
-	UserId          string `json:"user_id"`
-	PageSize        int    `json:"page_size"`
-	PageNumber      int    `json:"page_number"`
+	BookingSourceId string  `json:"booking_source_id"`
+	UserId          string  `json:"user_id"`
+	Pagination      PageDTO `json:"page_info"`
 }
 
 type BookingDTO struct {

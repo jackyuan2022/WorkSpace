@@ -30,13 +30,15 @@ func NewCategoryService() svc.CategoryService {
 }
 
 func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCategoryListRequest) (res *dto.DataListResponse[dto.CategoryDTO], err *core.AppError) {
-	values := []interface{}{r.CategoryType}
-	filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_type", values, "EQ", "string")}
-	wheres := []core.DbQueryWhere{core.NewDbQueryWhere(filters, "AND")}
+	wheres := []core.DbQueryWhere{}
+	if len(r.CategoryType) > 0 {
+		filters := []core.DbQueryFilter{core.NewDbQueryFilter("category_type", []interface{}{r.CategoryType}, "EQ", "string")}
+		wheres = append(wheres, core.NewDbQueryWhere(filters, "AND"))
+	}
 	query := &core.DbQuery{
 		QueryWheres: wheres,
-		PageSize:    r.PageSize,
-		PageNumber:  r.PageNumber,
+		PageSize:    r.Pagination.PageSize,
+		PageNumber:  r.Pagination.PageNumber,
 	}
 	result, err := s.dataRepo.QueryData(ctx, query)
 	if err != nil {
@@ -44,8 +46,8 @@ func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCatego
 	}
 	var catagoreList []dto.CategoryDTO
 	index := len(result)
-	if index > r.PageSize {
-		index = r.PageSize
+	if index > r.Pagination.PageSize {
+		index = r.Pagination.PageSize
 	}
 	for i := 0; i < index; i++ {
 		item := result[i]
@@ -61,9 +63,9 @@ func (s *CategoryServiceImpl) GetCategoryList(ctx *gin.Context, r *dto.GetCatego
 	res = &dto.DataListResponse[dto.CategoryDTO]{
 		DataList: catagoreList,
 		Pagination: dto.PageDTO{
-			PageSize:    r.PageSize,
-			PageNumber:  r.PageNumber,
-			HasNextPage: len(result) > r.PageSize,
+			PageSize:    r.Pagination.PageSize,
+			PageNumber:  r.Pagination.PageNumber,
+			HasNextPage: len(result) > r.Pagination.PageSize,
 		},
 	}
 	return res, nil
