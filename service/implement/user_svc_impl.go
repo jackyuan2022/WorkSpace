@@ -86,9 +86,6 @@ func (s *UserServiceImpl) Login(ctx *gin.Context, u *dto.LoginRequest) (r *dto.L
 	}
 
 	r = &dto.LoginResponse{
-		// Mobile:       user.Mobile,
-		// UserId:       user.DbBaseModel.Id,
-		// UserName:     user.Name,
 		User: dto.UserDTO{
 			Mobile:   user.Mobile,
 			UserId:   user.DbBaseModel.Id,
@@ -190,4 +187,87 @@ func (s *UserServiceImpl) RefreshToken(ctx *gin.Context, u *dto.RefreshTokenRequ
 	}
 
 	return r, nil
+}
+
+func (s *UserServiceImpl) GetUserList(ctx *gin.Context, r *dto.GetUserListRequest) (res *dto.DataListResponse[dto.UserDTO], err *core.AppError) {
+	wheres := []core.DbQueryWhere{}
+	if len(r.UserId) > 0 {
+		filters := []core.DbQueryFilter{core.NewDbQueryFilter("user_id", []interface{}{r.UserId}, "EQ", "string")}
+		wheres = append(wheres, core.NewDbQueryWhere(filters, "AND"))
+	}
+	query := &core.DbQuery{
+		QueryWheres: wheres,
+		PageSize:    r.Pagination.PageSize,
+		PageNumber:  r.Pagination.PageNumber,
+	}
+	result, err := s.userRepo.QueryData(ctx, query)
+	if err != nil {
+		return nil, core.NewUnexpectedError("Query User Data Failure")
+	}
+	var catagoreList []dto.UserDTO
+	index := len(result)
+	if index > r.Pagination.PageSize {
+		index = r.Pagination.PageSize
+	}
+	for i := 0; i < index; i++ {
+		item := result[i]
+		dto := dto.UserDTO{
+			UserId:    item.DbBaseModel.Id,
+			UserName:  item.Name,
+			Password:  "",
+			DenyLogin: item.DenyLogin,
+		}
+		catagoreList = append(catagoreList, dto)
+	}
+	res = &dto.DataListResponse[dto.UserDTO]{
+		DataList: catagoreList,
+		Pagination: dto.PageDTO{
+			PageSize:    r.Pagination.PageSize,
+			PageNumber:  r.Pagination.PageNumber,
+			HasNextPage: len(result) > r.Pagination.PageSize,
+		},
+	}
+	return res, nil
+}
+
+func (s *UserServiceImpl) UpdateUser(ctx *gin.Context, r *dto.DataRequest[dto.UserDTO]) (res *dto.DataResponse[dto.UserDTO], err *core.AppError) {
+	if r == nil {
+		return nil, core.NewValidationError("参数错误")
+	}
+
+	if strings.Trim(r.Data.UserName, " ") == "" {
+		return nil, core.NewValidationError("名称不能为空")
+	}
+	category := model.User{
+		Name:        r.Data.UserName,
+		Password:    r.Data.Password,
+		Mobile:      r.Data.Mobile,
+		DenyLogin:   r.Data.DenyLogin,
+		DbBaseModel: core.NewDbBaseModel(r.Data.UserId),
+	}
+
+	result, err := s.userRepo.UpdateUser(ctx, &category)
+	if err != nil {
+		return nil, core.NewUnexpectedError("Update User Data Failure")
+	}
+	res = &dto.DataResponse[dto.UserDTO]{
+		Data: dto.UserDTO{
+			UserId:    result.Id,
+			UserName:  result.Name,
+			Password:  "",
+			DenyLogin: result.DenyLogin,
+		},
+	}
+	return res, nil
+}
+
+func (s *UserServiceImpl) DeleteUser(ctx *gin.Context, r *dto.DataRequest[dto.UserDTO]) (res *dto.DataResponse[dto.UserDTO], err *core.AppError) {
+	_, err = s.userRepo.DeleteUserById(ctx, r.Data.UserId)
+	if err != nil {
+		return nil, core.NewUnexpectedError("Delete User Data Failure")
+	}
+	res = &dto.DataResponse[dto.UserDTO]{
+		Data: r.Data,
+	}
+	return res, nil
 }

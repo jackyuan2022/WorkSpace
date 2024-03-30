@@ -118,3 +118,18 @@ func (r *UserRepositoryImpl) DeleteUserById(ctx context.Context, id string) (boo
 	}
 	return true, nil
 }
+
+func (r *UserRepositoryImpl) QueryData(ctx context.Context, query *core.DbQuery) ([]model.User, *core.AppError) {
+	db, appErr := r.getDb()
+	if appErr != nil {
+		return nil, appErr
+	}
+	datas := []model.User{}
+	whereClaues, values, order := query.GetWhereClause()
+	offset := (query.PageNumber - 1) * query.PageSize
+	err := db.WithContext(ctx).Where(whereClaues, values...).Order(order).Offset(offset).Limit(query.PageSize + 1).Find(&datas).Error
+	if err != nil {
+		return nil, core.AsAppError(err)
+	}
+	return datas, nil
+}

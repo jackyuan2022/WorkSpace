@@ -14,4 +14,5 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *model.User) (*model.User, *core.AppError)
 	DeleteUserById(ctx context.Context, id string) (bool, *core.AppError)
 	DeleteUserByMobile(ctx context.Context, mobile string) (bool, *core.AppError)
+	QueryData(ctx context.Context, query *core.DbQuery) ([]model.User, *core.AppError)
 }
