@@ -80,12 +80,13 @@ func (r *UserRepositoryImpl) UpdateUser(ctx context.Context, u *model.User) (*mo
 		return nil, appErr
 	}
 	var user model.User
-	err := db.WithContext(ctx).Where("mobile = ?", u.Mobile).First(&user).Error
+	err := db.WithContext(ctx).Where("id = ?", u.Id).First(&user).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
 	}
 	user.Name = u.Name
 	user.DenyLogin = u.DenyLogin
+	user.Mobile = u.Mobile
 	err = db.WithContext(ctx).Save(&user).Error
 	if err != nil {
 		return nil, core.AsAppError(err)
