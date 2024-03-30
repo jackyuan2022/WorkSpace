@@ -35,8 +35,8 @@ func Run() {
 	// 	fmt.Println(err)
 	// }
 
-	go httpsRouter.RunTLS(":443", "./certs/loongkirin.chat.crt", "./certs/loongkirin.chat.key")
-	router.Run(":8081")
+	go httpsRouter.RunTLS(":8083", "./certs/loongkirin.fun_bundle.crt", "./certs/loongkirin.fun.key")
+	router.Run(":8082")
 }
 
 // 初始化gin总路由
@@ -61,7 +61,7 @@ func TlsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		secureMiddleware := secure.New(secure.Options{
 			SSLRedirect: true,
-			SSLHost:     ":443",
+			SSLHost:     ":8081",
 		})
 		err := secureMiddleware.Process(c.Writer, c.Request)
 		if err != nil {
