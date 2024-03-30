@@ -1,7 +1,6 @@
 package implement
 
 import (
-	"database/sql"
 	"strings"
 	"time"
 
@@ -125,7 +124,7 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 	d = dto.BookingDTO{
 		Id:               m.DbBaseModel.Id,
 		Title:            m.Title,
-		Content:          m.Content.String,
+		Content:          m.Content,
 		BookingStartTime: m.BookingStartTime.UnixMilli(),
 		BookingEndTime:   nil,
 		BookingSourceId:  m.BookingSourceId,
@@ -140,8 +139,8 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 			Mobile:   m.BookingUser.Mobile,
 		},
 	}
-	if m.BookingEndTime.Valid {
-		endTime := m.BookingEndTime.Time.UnixMilli()
+	if m.BookingEndTime != nil {
+		endTime := m.BookingEndTime.UnixMilli()
 		d.BookingEndTime = &endTime
 	}
 
@@ -155,9 +154,9 @@ func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking
 	}
 	m = model.Booking{
 		Title:            d.Title,
-		Content:          sql.NullString{String: d.Content},
+		Content:          d.Content,
 		BookingStartTime: time.UnixMilli(d.BookingStartTime),
-		BookingEndTime:   sql.NullTime{},
+		BookingEndTime:   nil,
 		BookingSourceId:  d.BookingSourceId,
 		UserId:           d.UserId,
 		BookingSource: model.BookingSource{
@@ -174,7 +173,7 @@ func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking
 	}
 	if d.BookingEndTime != nil {
 		endTime := time.UnixMilli(*d.BookingEndTime)
-		m.BookingEndTime.Time = endTime
+		m.BookingEndTime = &endTime
 	}
 
 	return m
