@@ -216,6 +216,7 @@ func (s *UserServiceImpl) GetUserList(ctx *gin.Context, r *dto.GetUserListReques
 			UserName:  item.Name,
 			Password:  "",
 			DenyLogin: item.DenyLogin,
+			Mobile:    item.Mobile,
 		}
 		catagoreList = append(catagoreList, dto)
 	}
