@@ -3,6 +3,7 @@ package implement
 import (
 	"database/sql"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -125,7 +126,7 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 		Id:               m.DbBaseModel.Id,
 		Title:            m.Title,
 		Content:          m.Content.String,
-		BookingStartTime: m.BookingStartTime,
+		BookingStartTime: m.BookingStartTime.UnixMilli(),
 		BookingEndTime:   nil,
 		BookingSourceId:  m.BookingSourceId,
 		UserId:           m.UserId,
@@ -140,7 +141,8 @@ func (s *BookingServiceImpl) convertModel2Dto(m model.Booking) (d dto.BookingDTO
 		},
 	}
 	if m.BookingEndTime.Valid {
-		d.BookingEndTime = &m.BookingEndTime.Time
+		endTime := m.BookingEndTime.Time.UnixMilli()
+		d.BookingEndTime = &endTime
 	}
 
 	return d
@@ -154,7 +156,7 @@ func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking
 	m = model.Booking{
 		Title:            d.Title,
 		Content:          sql.NullString{String: d.Content},
-		BookingStartTime: d.BookingStartTime,
+		BookingStartTime: time.UnixMilli(d.BookingStartTime),
 		BookingEndTime:   sql.NullTime{},
 		BookingSourceId:  d.BookingSourceId,
 		UserId:           d.UserId,
@@ -171,7 +173,8 @@ func (s *BookingServiceImpl) convertDto2Model(d dto.BookingDTO) (m model.Booking
 		DbBaseModel: core.NewDbBaseModel(id),
 	}
 	if d.BookingEndTime != nil {
-		m.BookingEndTime.Time = *d.BookingEndTime
+		endTime := time.UnixMilli(*d.BookingEndTime)
+		m.BookingEndTime.Time = endTime
 	}
 
 	return m
