@@ -33,6 +33,9 @@ func NewCaseTaskService() svc.CaseTaskService {
 func (s *CaseTaskServiceImpl) GetCaseTaskList(ctx *gin.Context, r *dto.GetCaseTaskListRequest) (res *dto.DataListResponse[dto.CaseTaskDTO], err *core.AppError) {
 	wheres := []core.DbQueryWhere{}
 	filters := []core.DbQueryFilter{}
+	if len(r.CategoryId) > 0 {
+		filters = append(filters, core.NewDbQueryFilter("category_id", []interface{}{r.CategoryId}, "EQ", "string"))
+	}
 	if len(r.UserId) > 0 {
 		filters = append(filters, core.NewDbQueryFilter("user_id", []interface{}{r.UserId}, "EQ", "string"))
 	}

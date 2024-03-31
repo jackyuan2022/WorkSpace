@@ -2,6 +2,7 @@ package dto
 
 type GetCaseTaskListRequest struct {
 	UserId     string  `json:"user_id"`
+	CategoryId string  `json:"category_id"`
 	Pagination PageDTO `json:"page_info"`
 }
 
