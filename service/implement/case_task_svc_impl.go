@@ -119,16 +119,18 @@ func (s *CaseTaskServiceImpl) DeleteCaseTask(ctx *gin.Context, r *dto.DataReques
 
 func (s *CaseTaskServiceImpl) convertModel2Dto(m model.CaseTask) (d dto.CaseTaskDTO) {
 	d = dto.CaseTaskDTO{
-		Id:      m.DbBaseModel.Id,
-		Name:    m.Name,
-		Content: m.Content,
-		UserId:  m.UserId,
+		Id:         m.DbBaseModel.Id,
+		Name:       m.Name,
+		Content:    m.Content,
+		UserId:     m.UserId,
+		CategoryId: m.CategoryId,
+		Status:     m.Status,
+		CaseTime:   m.CaseTime.UnixMilli(),
 		CaseUser: dto.UserDTO{
 			UserId:   m.CaseUser.Id,
 			UserName: m.CaseUser.Name,
 			Mobile:   m.CaseUser.Mobile,
 		},
-		Status:          m.Status,
 		CaseTaskDetails: []dto.CaseTaskDetailDTO{},
 	}
 
@@ -152,6 +154,7 @@ func (s *CaseTaskServiceImpl) convertDto2Model(d dto.CaseTaskDTO) (m model.CaseT
 		Name:        d.Name,
 		Content:     d.Content,
 		UserId:      d.UserId,
+		CategoryId:  d.CategoryId,
 		Status:      d.Status,
 		CaseTime:    time.UnixMilli(d.CaseTime),
 		DbBaseModel: core.NewDbBaseModel(id),

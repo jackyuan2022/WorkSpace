@@ -10,6 +10,7 @@ type CaseTaskDTO struct {
 	Name            string              `json:"name"`
 	CaseTime        int64               `json:"case_time"`
 	Content         string              `json:"content"`
+	CategoryId      string              `json:"category_id"`
 	UserId          string              `json:"user_id"`
 	CaseUser        UserDTO             `json:"case_user"`
 	Status          string              `json:"status"`
