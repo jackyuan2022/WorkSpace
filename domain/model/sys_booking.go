@@ -13,9 +13,9 @@ type Booking struct {
 	BookingEndTime   *time.Time    `json:"booking_end_time"`
 	Content          string        `json:"content" gorm:"size:1000"`
 	BookingSourceId  string        `json:"booking_source_id" gorm:"size:32"`
-	BookingSource    BookingSource `json:"booking_source" gorm:"foreignKey:BookingSourceId;references:id"`
+	BookingSource    BookingSource `json:"booking_source" gorm:"foreignKey:BookingSourceId;references:Id"`
 	UserId           string        `json:"user_id" gorm:"size:32"`
-	BookingUser      User          `json:"user" gorm:"foreignKey:UserId;references:id"`
+	BookingUser      User          `json:"user" gorm:"foreignKey:UserId;references:Id"`
 	Status           string        `json:"status" gorm:"size:100;default:ongoing"`
 }
 

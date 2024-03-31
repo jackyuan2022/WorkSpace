@@ -20,6 +20,9 @@ func (e *Entry) InitAllRouter(router *gin.RouterGroup) {
 	bookingRouter := BookingRouter{}
 	bookingRouter.InitBookingRouter(router)
 
+	caseTaskRouter := CaseTaskRouter{}
+	caseTaskRouter.InitCaseTaskRouter(router)
+
 	userRouter := UserRouter{}
 	userRouter.InitUserRouter(router)
 

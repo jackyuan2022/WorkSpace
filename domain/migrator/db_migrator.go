@@ -18,5 +18,7 @@ func MigrateDb(dbContext core.DbContext) {
 	db.AutoMigrate(&model.Category{})
 	db.AutoMigrate(&model.BookingSource{})
 	db.AutoMigrate(&model.Booking{})
+	db.AutoMigrate(&model.CaseTask{})
+	db.AutoMigrate(&model.CaseTaskDetail{})
 	fmt.Println("migrate db end.....")
 }
